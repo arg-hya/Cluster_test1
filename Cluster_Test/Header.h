@@ -5,7 +5,13 @@
 #define SUCCESS		0
 #define FAIL		1
 
+#define INIT_CLUSTERPOINTS		10
 
+#define MIN_INIT_CLUSTERPOINTS	5
+
+#define HARD_CLUSTERING_FACTOR	2
+
+#define MARK_POINTS_FACTOR		2
 
 
 #define RANDOM(min, max)  min + rand() % (max - min + 1) //range : [min, max] . Seeding done in constructor. [INTEGER]

@@ -84,7 +84,7 @@ int FFT_WIKI::fft_test1(int totDim, int* input, double* output)
 	for (int i = 1; i < 2 * totDim; i = i + 2)
 	{
 		output[k] = vec[i].real();
-		std::cout << output[k] << " ";
+	//	std::cout << output[k] << " ";
 		k++;
 	}
 

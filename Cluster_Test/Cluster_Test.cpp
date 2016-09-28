@@ -24,16 +24,22 @@ int _tmain(int argc, _TCHAR* argv[])
 	totSample = intr->getTotSampleno();
 	totDim = intr->getTotDimno();
 
-	//ClusterAlgo *cls = new ClusterAlgo(totSample, totDim);
-	//cls->allocatePoints(intr->getPoints());
-	//cls->~ClusterAlgo();
+	ClusterAlgo *cls = new ClusterAlgo(intr->getTotSampleno(), intr->getTotDimno());
+	
 
-	intr->readFiletoString();
-	intr->parseString();
+	/*intr->readFiletoString();
+	intr->parseString();*/
+	//intr->showPoints();
+	cls->allocatePoints(intr->getPoints());
+	cls->run();
+//	cls->printPointsWithClusters();
+
 	intr->showPoints();
-	//intr->releasePoints();
+
+	intr->releasePoints();
+	delete cls;	// cls->~ClusterAlgo();
+
 	delete intr;
-	//intr->~IRISInterface();
 
 	return 0;
 }

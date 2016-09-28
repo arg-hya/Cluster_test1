@@ -18,7 +18,7 @@
 #define square(x)  ((x)*(x))
 #define mod(x)  (x<0.0)? (-1 * x) : (x);
 #define MIN(a,b) (((a)<(b))?(a):(b))
-#define MAX(a,b) (((a)>(b))?(a):(b))
+#define MAX_NO(a,b) (((a)>(b))?(a):(b))
 
 #define int int
 //typedef int int;

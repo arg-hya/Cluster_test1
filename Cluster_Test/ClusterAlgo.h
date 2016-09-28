@@ -5,6 +5,7 @@
 #include <time.h>       /* time */
 #include <random>
 #include "Header.h"
+#include "FFT_WIKI.h"
 
 class ClusterAlgo
 {
@@ -31,17 +32,15 @@ private:
 
 	int getRandomPoints(int no_testPoints, int * testPoints);
 	//bool isEvaluated(int pos);
-	int hard_clustering(int totDim, int *Input, int init_no_points, int *Output, int out_init_no_points);
+	int hard_clustering(int totDim, int *Input, int init_no_points, int *Output, int& out_init_no_points);
 	int getSimilarPoints(int &no_testPoints, int * testPoints);
 
 	bool isAllMarkedAtleastOnce();
 
 	//int markPointsIntra(int &init_no_points, node* &testDeck, int clusternumber);
 	int formCluster(int &no_testPoints, int * testPoints, double *newCluster);
-	int calculateThreshold(int &no_testPoints, int * testPoints, double threshold);
+	int calculateThreshold(int &no_testPoints, int * testPoints, double&  threshold);
 	int markPoints(int clusterNos, double *newCluster, double threshold); 
-
-	int printPointsWithClusters();
 
 	std::vector<double*> Clusters;	//Stores the best fittness level of each generation.
 
@@ -55,5 +54,7 @@ public:
 	int allocatePoints(node *Points);
 
 	int run();
+
+	int printPointsWithClusters();
 
 };

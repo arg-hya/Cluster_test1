@@ -70,11 +70,19 @@ int ClusterAlgo::allocatePoints(node *Points)
 }
 
 int ClusterAlgo::getFFTofAllPoints()
-{
+{	
 	for (int i = 0; i < totSample; i++)
 	{
-//		fft_test1(totDim, Nodes[i].dim, fftOfPoints[i].samples);
+		std::cout <<std::endl;
+		std::cout << i << std::endl;
+		FFT_WIKI::fft_test1(totDim, Nodes[i].dim, fftOfPoints[i].samples);
+		std::cout << std::endl;
+		for (int j = 0; j < totDim; j++)
+		{
+			std::cout << fftOfPoints[i].samples[j] << " ";
+		}
 	}
+	
 	return SUCCESS;
 }
 
@@ -91,7 +99,7 @@ int ClusterAlgo::getRandomPoints(int no_testPoints, int * testPoints)
 	k = 0;
 	do
 	{
-		int temp = RANDOM(0, totSample);
+		int temp = RANDOM(0, totSample - 1);
 
 	//	if (isEvaluated(temp))	continue;
 
@@ -107,15 +115,16 @@ int ClusterAlgo::getRandomPoints(int no_testPoints, int * testPoints)
 	return SUCCESS;
 }
 
-int ClusterAlgo::hard_clustering(int totDim, int *Input, int init_no_points, int *Output, int out_init_no_points)
+int ClusterAlgo::hard_clustering(int totDim, int *Input, int init_no_points, int *Output, int& out_init_no_points)
 {
 	//
 	unsigned int min_dis = 0;
 	int a = -1, b = -1;
+	int factor = 5;
 
 	for (int i = 0; i < init_no_points; i++)
 	{
-		for (int j = i; j < init_no_points; j++)
+		for (int j = i + 1; j < init_no_points; j++)
 		{
 			unsigned int dis = 0;
 
@@ -139,6 +148,8 @@ int ClusterAlgo::hard_clustering(int totDim, int *Input, int init_no_points, int
 	//
 	unsigned int radius = min_dis;
 	node CENTROID;
+	CENTROID.dim = new int[totDim];
+
 	for (int k = 0; k < totDim; k++)
 	{
 		CENTROID.dim[k] = Nodes[Input[a]].dim[k] + Nodes[Input[b]].dim[k];
@@ -160,10 +171,10 @@ int ClusterAlgo::hard_clustering(int totDim, int *Input, int init_no_points, int
 		for (int k = 0; k < totDim; k++)
 		{
 			dis += (unsigned int)std::pow(Nodes[Input[j]].dim[k] - CENTROID.dim[k], 2);
-		}
+		} 
 		dis = (unsigned int)std::sqrt(dis);
 
-		if (dis <= radius)
+		if (dis <= factor * radius)
 		{
 			pos_array[j] = true;
 		}
@@ -228,10 +239,10 @@ int ClusterAlgo::formCluster(int &no_testPoints, int * testPoints, double *newCl
 {
 	int *avg_dim = new int[no_testPoints];
 
-	for (int i = 0; i < no_testPoints; i++)
+	for (int i = 0; i < totDim; i++)
 	{
 		double sum = 0.0;
-		for (int j = 0; j < totDim; j++)
+		for (int j = 0; j < no_testPoints; j++)
 		{
 			sum += Nodes[testPoints[i]].dim[j];
 		}
@@ -239,18 +250,18 @@ int ClusterAlgo::formCluster(int &no_testPoints, int * testPoints, double *newCl
 		avg_dim[i] = (int)sum;
 	}
 
-//	fft_test1(totDim, avg_dim, newCluster);
+	FFT_WIKI::fft_test1(totDim, avg_dim, newCluster);
 
 	return SUCCESS;
 }
 
-int ClusterAlgo::calculateThreshold(int &no_testPoints, int * testPoints, double threshold)
+int ClusterAlgo::calculateThreshold(int &no_testPoints, int * testPoints, double& threshold)
 {
 	double min_dis = 0.0;
 
 	for (int i = 0; i < no_testPoints; i++)
 	{
-		for (int j = i; j < no_testPoints; j++)
+		for (int j = i + 1 ; j < no_testPoints; j++)
 		{
 			unsigned int dis = 0;
 
@@ -261,7 +272,7 @@ int ClusterAlgo::calculateThreshold(int &no_testPoints, int * testPoints, double
 
 			dis = (unsigned int)std::sqrt(dis);
 
-			if ((dis < min_dis) || (i == 0))
+			if ((dis > min_dis) || (i == 0))
 			{
 				min_dis = dis;
 			}
@@ -273,16 +284,17 @@ int ClusterAlgo::calculateThreshold(int &no_testPoints, int * testPoints, double
 }
 int ClusterAlgo::markPoints(int clusterNos, double *newCluster, double threshold)
 {
+	int factor = 4;
 	for (int i = 0; i < totSample; i++)
 	{
 		double score = 0.0;
 		for (int j = 0; j < totDim; j++)
 		{
-			score = std::pow(fftOfPoints[i].samples[j] - newCluster[j], 2);
+			score += std::pow(fftOfPoints[i].samples[j] - newCluster[j], 2);
 		}
 		std::sqrt(score);
 
-		if (score <= threshold)
+		if (score <= factor*threshold)
 		{
 			Nodes[i].clusterNos.push_back(clusterNos);				// +Nodes[i].numberOfAssignedClusters;
 			Nodes[i].numberOfAssignedClusters++;
@@ -337,7 +349,7 @@ int ClusterAlgo::run()
 		}
 	} while (!isAllMarkedAtleastOnce());
 
-	printPointsWithClusters();
+	//printPointsWithClusters();
 
 	return SUCCESS;
 }

@@ -77,6 +77,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FFT_WIKI.h" />
     <ClInclude Include="Header.h" />
     <ClInclude Include="ClusterAlgo.h" />
     <ClInclude Include="IRISInterface.h" />
@@ -86,6 +87,7 @@
   <ItemGroup>
     <ClCompile Include="ClusterAlgo.cpp" />
     <ClCompile Include="Cluster_Test.cpp" />
+    <ClCompile Include="FFT_WIKI.cpp" />
     <ClCompile Include="IRISInterface.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

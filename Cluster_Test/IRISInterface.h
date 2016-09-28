@@ -13,6 +13,9 @@ private:
 
 	node *nodes = NULL;
 
+	int readFiletoString();
+	int parseString();
+
 public :
 	IRISInterface();
 	//~IRISInterface();
@@ -22,7 +25,5 @@ public :
 	node* getPoints();
 	int releasePoints();
 
-	int readFiletoString();
-	int parseString();
 	int showPoints();
 };

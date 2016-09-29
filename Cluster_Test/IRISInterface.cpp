@@ -90,7 +90,7 @@ node* IRISInterface::getPoints()
 
 int IRISInterface::releasePoints()
 {
-	for (int i = 0; i < TOT_SAMPLES; i++)
+	/*for (int i = 0; i < TOT_SAMPLES; i++)
 	{
 		if (nodes[i].dim)
 		{
@@ -103,7 +103,7 @@ int IRISInterface::releasePoints()
 			std::vector<int>().swap(nodes[i].clusterNos);
 		}
 
-	}
+	}*/
 
 	/*if (nodes)
 	{

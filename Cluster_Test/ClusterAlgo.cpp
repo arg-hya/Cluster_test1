@@ -297,10 +297,68 @@ int ClusterAlgo::calculateThreshold(int &no_testPoints, int * testPoints, double
 
 	return SUCCESS;
 }
+
+int ClusterAlgo::markPoints_dotproduct(int clusterNos, double *newCluster, double threshold)
+{
+	int flag = 0;
+	double factor = 0.995;// MARK_POINTS_FACTOR;
+	std::vector<int> pos;
+	for (int i = 0; i < totSample; i++)
+	{
+		double score = 0.0;
+		double a = 0.0, b = 0.0;
+		for (int j = 0; j < totDim; j++)
+		{
+			score += (fftOfPoints[i].samples[j] * newCluster[j]);
+			a += std::pow(fftOfPoints[i].samples[j], 2);
+			b += std::pow(newCluster[j], 2);
+		}
+		a = std::sqrt(a);
+		b = std::sqrt(b);
+		score /= (a*b);
+		score /= (a - b);
+		score = mod(score);
+		//double diff = a - b;
+		//diff /= (a*b);
+		//diff = mod(diff);
+		//if ((score * diff) >= factor)
+		if (score >= factor)
+		{
+			double temp = score - factor;
+			temp /= factor;
+			flag++;
+			Nodes[i].clusterNos.push_back({ clusterNos, temp });				// +Nodes[i].numberOfAssignedClusters;
+			Nodes[i].numberOfAssignedClusters++;
+			pos.push_back(i);
+		}
+	}
+
+	if (MIN_INIT_CLUSTERPOINTS >= flag)
+	{
+		return FAIL;
+	}
+	else
+	{
+		std::cout << std::endl;
+		std::cout << std::endl;
+		std::cout << "Cluster No " << clusterNos << "  ::   ";
+		std::cout << std::endl << "==============================" << std::endl;
+		std::cout << "Total number of points in this cluster :: " << flag << std::endl << " Points are :: ";
+		for (int i = 0; i < pos.size(); i++)
+		{
+			std::cout << " " << pos[i];
+		//	std::cout << " Per: " << Nodes[pos[i]].clusterNos[Nodes[pos[i]].numberOfAssignedClusters - 1].percision;
+		}
+		std::vector<int>().swap(pos);
+	}
+	return SUCCESS;
+}
+
 int ClusterAlgo::markPoints(int clusterNos, double *newCluster, double threshold)
 {
 	int flag = 0;
 	int factor = MARK_POINTS_FACTOR;
+	std::vector<int> pos;
 	for (int i = 0; i < totSample; i++)
 	{
 		double score = 0.0;
@@ -312,14 +370,32 @@ int ClusterAlgo::markPoints(int clusterNos, double *newCluster, double threshold
 
 		if (score <= factor*threshold)
 		{
+			double temp = factor*threshold - score;
+			temp /= factor*threshold;
 			flag++;
-			Nodes[i].clusterNos.push_back(clusterNos);				// +Nodes[i].numberOfAssignedClusters;
+			Nodes[i].clusterNos.push_back({ clusterNos, temp });				// +Nodes[i].numberOfAssignedClusters;
 			Nodes[i].numberOfAssignedClusters++;
+			pos.push_back(i);
 		}
 	}
-	if (!flag)
+	
+	if (MIN_INIT_CLUSTERPOINTS >= flag)
 	{
 		return FAIL;
+	}
+	else
+	{
+		std::cout << std::endl;
+		std::cout << std::endl;
+		std::cout << "Cluster No " << clusterNos << "  ::   ";
+		std::cout << std::endl << "==============================" << std::endl;
+		std::cout << "Total number of points in this cluster :: " << flag << std::endl << " Points are :: ";
+		for (int i = 0; i < pos.size(); i++)
+		{
+			std::cout << " " << pos[i];
+			std::cout << " Per: " << Nodes[pos[i]].clusterNos[Nodes[pos[i]].numberOfAssignedClusters - 1].percision;
+		}
+		std::vector<int>().swap(pos);
 	}
 	return SUCCESS;
 }
@@ -345,7 +421,7 @@ int ClusterAlgo::printPointsWithClusters()
 		{
 			for (int j = 0; j < Nodes[k].numberOfAssignedClusters; j++)
 			{
-				if (i == Nodes[k].clusterNos[j])
+				if (i == Nodes[k].clusterNos[j].clusterNumber)
 				{
 					totSamples++;
 					//std::cout << Nodes[k].no - 1 << "   ";
@@ -379,8 +455,9 @@ int ClusterAlgo::run()
 			newCluster = new double[totDim];			
 			formCluster(no_testPoints, testPoints, newCluster);
 			calculateThreshold(no_testPoints, testPoints, threshold);
-			//markPointsIntra(init_no_points, testDeck , clusternumber);
-			if (SUCCESS == markPoints(clusternumber, newCluster, threshold))
+			//markPointsIntra(init_no_points, testDeck , clusternumber); 
+			//if (SUCCESS == markPoints(clusternumber, newCluster, threshold))
+			if (SUCCESS == markPoints_dotproduct(clusternumber, newCluster, threshold))
 			{				
 				Clusters.push_back(newCluster);
 				clusternumber++;

@@ -7,11 +7,11 @@
 
 #define INIT_CLUSTERPOINTS		10
 
-#define MIN_INIT_CLUSTERPOINTS	5
+#define MIN_INIT_CLUSTERPOINTS	3
 
 #define HARD_CLUSTERING_FACTOR	2
 
-#define MARK_POINTS_FACTOR		2
+#define MARK_POINTS_FACTOR		1
 
 
 #define RANDOM(min, max)  min + rand() % (max - min + 1) //range : [min, max] . Seeding done in constructor. [INTEGER]
@@ -29,10 +29,15 @@
 #define int int
 //typedef int int;
 
+struct point_clusters {
+	int clusterNumber;
+	double percision;
+};
+
 struct node {
 	int no = -1;
 	//std::vector<int> clusterNos;
-	std::vector<int> clusterNos;
+	std::vector<point_clusters> clusterNos;
 	//int *clusterNos = NULL;
 	int numberOfAssignedClusters = 0;
 	int *dim = NULL;

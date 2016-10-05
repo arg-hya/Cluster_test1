@@ -32,7 +32,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	//intr->showPoints();
 	cls->allocatePoints(intr->getPoints());
 	cls->run();
-	cls->printPointsWithClusters();
+	//cls->printPointsWithClusters();
 
 //	intr->showPoints();
 
@@ -40,6 +40,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	delete cls;	// cls->~ClusterAlgo();
 
 	delete intr;
+
+	cin.get();
 
 	return 0;
 }

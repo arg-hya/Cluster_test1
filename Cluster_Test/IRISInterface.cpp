@@ -39,7 +39,7 @@ int IRISInterface::readFiletoString()
 	file.seekg(0, std::ios::end);
 	file_size = (unsigned int)file.tellg();
 	file.seekg(0, std::ios::beg);
-	str = new char[file_size + 1];
+	str = new char[file_size + 1]; //
 	file.read(str, file_size);
 	str[file_size] = 0;
 

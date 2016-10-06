@@ -17,6 +17,8 @@ ClusterAlgo::ClusterAlgo(int _totSample, int _totDim )
 		fftOfPoints[i].samples = new double[_totDim];
 	}
 
+	sigClusters = new SignificantClusters[_totSample];
+
 //	pointsLeft = totSample;
 
 	Nodes = NULL;
@@ -54,6 +56,12 @@ ClusterAlgo::~ClusterAlgo()
 	{
 		delete[] fftOfPoints;
 		fftOfPoints = NULL;
+	}
+
+	if (sigClusters)
+	{
+		delete[] sigClusters;
+		sigClusters = NULL;
 	}
 
 	if (Clusters.size() > 0)
@@ -316,7 +324,7 @@ int ClusterAlgo::markPoints_dotproduct(int clusterNos, double *newCluster, doubl
 		a = std::sqrt(a);
 		b = std::sqrt(b);
 		score /= (a*b);
-		score /= (a - b);
+		//score /= (a - b);
 		score = mod(score);
 		//double diff = a - b;
 		//diff /= (a*b);
@@ -339,16 +347,16 @@ int ClusterAlgo::markPoints_dotproduct(int clusterNos, double *newCluster, doubl
 	}
 	else
 	{
-		std::cout << std::endl;
-		std::cout << std::endl;
-		std::cout << "Cluster No " << clusterNos << "  ::   ";
-		std::cout << std::endl << "==============================" << std::endl;
-		std::cout << "Total number of points in this cluster :: " << flag << std::endl << " Points are :: ";
-		for (int i = 0; i < pos.size(); i++)
-		{
-			std::cout << " " << pos[i];
-		//	std::cout << " Per: " << Nodes[pos[i]].clusterNos[Nodes[pos[i]].numberOfAssignedClusters - 1].percision;
-		}
+		//std::cout << std::endl;
+		//std::cout << std::endl;
+		//std::cout << "Cluster No " << clusterNos << "  ::   ";
+		//std::cout << std::endl << "==============================" << std::endl;
+		//std::cout << "Total number of points in this cluster :: " << flag << std::endl << " Points are :: ";
+		//for (int i = 0; i < pos.size(); i++)
+		//{
+		//	std::cout << " " << pos[i];
+		////	std::cout << " Per: " << Nodes[pos[i]].clusterNos[Nodes[pos[i]].numberOfAssignedClusters - 1].percision;
+		//}
 		std::vector<int>().swap(pos);
 	}
 	return SUCCESS;
@@ -385,7 +393,7 @@ int ClusterAlgo::markPoints(int clusterNos, double *newCluster, double threshold
 	}
 	else
 	{
-		std::cout << std::endl;
+		/*std::cout << std::endl;
 		std::cout << std::endl;
 		std::cout << "Cluster No " << clusterNos << "  ::   ";
 		std::cout << std::endl << "==============================" << std::endl;
@@ -394,7 +402,7 @@ int ClusterAlgo::markPoints(int clusterNos, double *newCluster, double threshold
 		{
 			std::cout << " " << pos[i];
 			std::cout << " Per: " << Nodes[pos[i]].clusterNos[Nodes[pos[i]].numberOfAssignedClusters - 1].percision;
-		}
+		}*/
 		std::vector<int>().swap(pos);
 	}
 	return SUCCESS;
@@ -435,6 +443,121 @@ int ClusterAlgo::printPointsWithClusters()
 	return SUCCESS;
 }
 
+int ClusterAlgo::debugClusters()
+{
+	for (int k = 0; k < totSample; k++)
+	{
+		double max_per = 0.0;
+		int indx = -1;
+
+		for (int j = 0; j < Nodes[k].numberOfAssignedClusters; j++)
+		{
+			if (Nodes[k].clusterNos[j].percision > max_per)
+			{
+				indx = j;
+			}
+		}
+
+		sigClusters[k].ClusterNumber = Nodes[k].clusterNos[indx].clusterNumber;
+		sigClusters[k].percesion = Nodes[k].clusterNos[indx].percision;
+		//std::cout << "Sample No : " << k << " Cluster : " << Nodes[k].clusterNos[indx].clusterNumber << std::endl;
+	}
+	return SUCCESS;
+}
+
+int ClusterAlgo::compressClusters()
+{
+	int i;
+	int ClusterName;
+
+	//ClusterFreq *ClusterFreqebcy = new ClusterFreq[];
+
+	std::vector<ClusterFreq> ClusterFr;
+
+	for (int k = 0; k < totSample; k++)
+	{
+		ClusterName = sigClusters[k].ClusterNumber;
+
+		for (i = 0; i < ClusterFr.size(); i++)
+		{
+			if (ClusterName == ClusterFr[i].name)
+			{
+				ClusterFr[i].count++;
+				break;
+			}
+		}
+		if (i == ClusterFr.size())
+		{
+			ClusterFreq temp;
+			temp.name = ClusterName;
+			temp.count = 1;
+			ClusterFr.push_back(temp);
+		}
+	}
+
+	//find the one with minimum count
+	int min_clusternumber = -1;
+	int count = ClusterFr[0].count;
+
+	for (i = 0; i < ClusterFr.size(); i++)
+	{
+		if (ClusterFr[i].count < count)
+		{
+			count = ClusterFr[i].count;
+			min_clusternumber = ClusterFr[i].name;
+		}
+	}
+
+	//find its alias
+	int aliasClusterName = -1;
+	double score = 0.0;
+	double a, b;
+	for (i = 0; i < ClusterFr.size(); i++)
+	{
+		double temp = 0.0;
+		a = b = 0.0;
+		
+		if (ClusterFr[i].name != min_clusternumber)
+		{
+			for (int j = 0; j < totDim; j++)
+			{
+				temp += (Clusters[ClusterFr[i].name][j] * Clusters[min_clusternumber][j]);
+				a += std::pow(Clusters[ClusterFr[i].name][j], 2);
+				b += std::pow(Clusters[min_clusternumber][j], 2);
+			}			
+		}
+
+		a = std::sqrt(a);
+		b = std::sqrt(b);
+		temp /= (a*b);
+		//score /= (a - b);
+		temp = mod(temp);
+
+		if (temp > score)
+		{
+			score = temp;
+			aliasClusterName = ClusterFr[i].name;
+		}
+	}
+
+	//replace all with the alias
+	for (int k = 0; k < totSample; k++)
+	{
+		if (sigClusters[k].ClusterNumber == min_clusternumber)	sigClusters[k].ClusterNumber = aliasClusterName;
+	}
+
+	return SUCCESS;
+}
+
+bool ClusterAlgo::showResults()
+{
+	for (int k = 0; k < totSample; k++)
+	{
+		std::cout << "Sample No : " << k << " Cluster : " << sigClusters[k].ClusterNumber << std::endl;
+	}
+	return true;
+}
+
 int ClusterAlgo::run()
 {
 	getFFTofAllPoints();
@@ -470,13 +593,15 @@ int ClusterAlgo::run()
 			testPoints = NULL;
 		}
 
-		if (newCluster)
+		/*if (newCluster)
 		{
 			delete[] newCluster;
 			newCluster = NULL;
-		}
+		}*/
 
 	} while (!isAllMarkedAtleastOnce());
+
+	debugClusters();
 
 	//printPointsWithClusters();
 

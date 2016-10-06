@@ -24,7 +24,19 @@ private:
 		double *samples = NULL;
 	};
 
+	struct SignificantClusters {
+		size_t ClusterNumber = -1;
+		double percesion = 0.0;
+	};
+
+	struct ClusterFreq
+	{
+		int name = -1;
+		int count = 0;
+	};
+
 	FFTPoints *fftOfPoints = NULL;
+	SignificantClusters *sigClusters = NULL;
 	//int pointsLeft;
 	//bool *storePoint;
 
@@ -54,9 +66,10 @@ public:
 	~ClusterAlgo();
 
 	int allocatePoints(node *Points);
-
 	int run();
-
+	int debugClusters();
 	int printPointsWithClusters();
+	int compressClusters();
+	bool showResults();	
 
 };

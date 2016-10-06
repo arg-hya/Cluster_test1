@@ -33,6 +33,15 @@ int _tmain(int argc, _TCHAR* argv[])
 	cls->allocatePoints(intr->getPoints());
 	cls->run();
 	//cls->printPointsWithClusters();
+	//cls->showResults();
+	cls->compressClusters();
+	//cls->showResults();
+	cls->compressClusters();
+	cls->compressClusters();
+	cls->compressClusters();
+	//cls->compressClusters();
+	//cls->compressClusters();
+	cls->showResults();
 
 //	intr->showPoints();
 

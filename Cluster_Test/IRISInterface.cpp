@@ -27,7 +27,7 @@ int IRISInterface::readFiletoString()
 {
 	unsigned int file_size;
 	
-	file.open("data.txt", std::ios::in);
+	file.open("Datasets\\Iris.data", std::ios::in);
 
 	if (!file.is_open())
 	{

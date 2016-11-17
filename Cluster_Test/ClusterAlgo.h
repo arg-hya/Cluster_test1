@@ -54,7 +54,7 @@ private:
 	int calculateThreshold(int &no_testPoints, int * testPoints, double&  threshold);
 	int markPoints(int clusterNos, double *newCluster, double threshold); 
 
-	int markPoints_dotproduct(int clusterNos, double *newCluster, double threshold);
+	int markPoints_dotproduct(int clusterNos, double *newCluster, double threshold, int &no_testPoints, int * testPoints);
 
 	std::vector<double*> Clusters;	//Stores the best fittness level of each generation.
 
@@ -70,6 +70,7 @@ public:
 	int debugClusters();
 	int printPointsWithClusters();
 	int compressClusters();
+	bool showResultsALL();
 	bool showResults();	
 
 };

@@ -5,7 +5,7 @@
 #define SUCCESS		0
 #define FAIL		1
 
-#define INIT_CLUSTERPOINTS		10
+#define INIT_CLUSTERPOINTS		25
 
 #define MIN_INIT_CLUSTERPOINTS	3
 
@@ -40,7 +40,7 @@ struct node {
 	std::vector<point_clusters> clusterNos;
 	//int *clusterNos = NULL;
 	int numberOfAssignedClusters = 0;
-	int *dim = NULL;
+	double *dim = NULL;
 };
 
 //const double epsilon = pow(10.0, -8);

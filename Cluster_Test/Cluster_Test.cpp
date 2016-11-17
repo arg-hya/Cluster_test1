@@ -4,6 +4,7 @@
 #include "stdafx.h"
 
 #include "IRISInterface.h"
+#include "GlassInterface.h"
 #include "ClusterAlgo.h"
 #include <vector>
 #include "Header.h"
@@ -20,7 +21,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	
 	int totSample = -1, totDim = -1 ;
 
-	IRISInterface *intr = new IRISInterface();
+	//IRISInterface *intr = new IRISInterface();
+	GlassInterface *intr = new GlassInterface();
 	totSample = intr->getTotSampleno();
 	totDim = intr->getTotDimno();
 
@@ -31,16 +33,17 @@ int _tmain(int argc, _TCHAR* argv[])
 	intr->parseString();*/
 	//intr->showPoints();
 	cls->allocatePoints(intr->getPoints());
-	cls->run();
+	cls->run(); 
+	//cls->showResultsALL();
+	cls->showResults();
 	//cls->printPointsWithClusters();
-	//cls->showResults();
+
 	cls->compressClusters();
-	//cls->showResults();
+
 	cls->compressClusters();
 	cls->compressClusters();
 	cls->compressClusters();
-	//cls->compressClusters();
-	//cls->compressClusters();
+
 	cls->showResults();
 
 //	intr->showPoints();

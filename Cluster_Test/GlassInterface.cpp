@@ -1,33 +1,33 @@
 #include "stdafx.h"
-#include "IRISInterface.h"
+#include "GlassInterface.h"
 
-IRISInterface::IRISInterface()
+GlassInterface::GlassInterface()
 {
-	TOT_SAMPLES = 150;
-	TOT_DIM = 4;	
-	TOT_ATTRIBUTES = TOT_DIM + 1;
+	TOT_SAMPLES = 214;
+	TOT_DIM = 9;	
+	TOT_ATTRIBUTES = TOT_DIM + 2;
 }
 
-//IRISInterface::~IRISInterface()
+//GlassInterface ::~GlassInterface ()
 //{
 //	
 //}
 
-int IRISInterface::getTotSampleno()
+int GlassInterface::getTotSampleno()
 {
 	return TOT_SAMPLES;
 }
 
-int IRISInterface::getTotDimno()
+int GlassInterface::getTotDimno()
 {
 	return TOT_DIM;
 }
 
-int IRISInterface::readFiletoString()
+int GlassInterface::readFiletoString()
 {
 	unsigned int file_size;
 	
-	file.open("Datasets\\Iris.data", std::ios::in);
+	file.open("Datasets\\Glass_DataSet.data", std::ios::in);
 
 	if (!file.is_open())
 	{
@@ -48,10 +48,10 @@ int IRISInterface::readFiletoString()
 	return SUCCESS;
 }
 
-int IRISInterface::parseString()
+int GlassInterface::parseString()
 {
 	int k = 0, dim_indx = 0;
-	float temp;
+	double temp;
 	int flag = 1;
 	
 	for (str = std::strtok(str, tokens); str; str = std::strtok(NULL, tokens))
@@ -59,13 +59,14 @@ int IRISInterface::parseString()
 		if (1 == flag)
 		{
 			nodes[k].no = k + 1;
-			nodes[k].dim = new int[TOT_DIM];
+			nodes[k].dim = new double[TOT_DIM];
 		}
 
-		if (TOT_ATTRIBUTES != flag)
+		else if (TOT_ATTRIBUTES != flag)
 		{
-			temp = (float)std::atof(str);
-			nodes[k].dim[dim_indx] = (int)(temp * 10);
+			temp = (double)std::atof(str);
+			//nodes[k].dim[dim_indx] = (int)(temp * 10);
+			nodes[k].dim[dim_indx] = temp;
 			dim_indx++;
 		}
 		else
@@ -80,7 +81,7 @@ int IRISInterface::parseString()
 	return SUCCESS;
 }
 
-node* IRISInterface::getPoints()
+node* GlassInterface::getPoints()
 {
 	nodes = new node[TOT_SAMPLES];
 	readFiletoString();
@@ -88,7 +89,7 @@ node* IRISInterface::getPoints()
 	return nodes;
 }
 
-int IRISInterface::releasePoints()
+int GlassInterface::releasePoints()
 {
 	/*for (int i = 0; i < TOT_SAMPLES; i++)
 	{
@@ -120,7 +121,7 @@ int IRISInterface::releasePoints()
 	return SUCCESS;
 }
 
-int IRISInterface::showPoints()
+int GlassInterface::showPoints()
 {
 	for (int i = 0; i < TOT_SAMPLES; i++)
 	{

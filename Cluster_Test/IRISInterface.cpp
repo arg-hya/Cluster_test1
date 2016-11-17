@@ -51,7 +51,7 @@ int IRISInterface::readFiletoString()
 int IRISInterface::parseString()
 {
 	int k = 0, dim_indx = 0;
-	float temp;
+	double temp;
 	int flag = 1;
 	
 	for (str = std::strtok(str, tokens); str; str = std::strtok(NULL, tokens))
@@ -59,13 +59,14 @@ int IRISInterface::parseString()
 		if (1 == flag)
 		{
 			nodes[k].no = k + 1;
-			nodes[k].dim = new int[TOT_DIM];
+			nodes[k].dim = new double[TOT_DIM];
 		}
 
 		if (TOT_ATTRIBUTES != flag)
 		{
-			temp = (float)std::atof(str);
-			nodes[k].dim[dim_indx] = (int)(temp * 10);
+			temp = (double)std::atof(str);
+			//nodes[k].dim[dim_indx] = (int)(temp * 10);
+			nodes[k].dim[dim_indx] = temp;
 			dim_indx++;
 		}
 		else

@@ -67,7 +67,7 @@ void FFT_WIKI::FFT(complex<double>* f, int N, double d)
 		f[i] *= d; //multiplying by step
 }
 
-int FFT_WIKI::fft_test1(int totDim, int* input, double* output)
+int FFT_WIKI::fft_test1(int totDim, double* input, double* output)
 {
 	complex<double> vec[MAX];
 

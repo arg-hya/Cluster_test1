@@ -3,7 +3,7 @@
 #include <fstream>
 
 #include "Header.h"
-class IRISInterface  
+class GlassInterface
 {
 private:
 	int TOT_SAMPLES = -1, TOT_DIM = -1, TOT_ATTRIBUTES = 1;
@@ -17,8 +17,8 @@ private:
 	int parseString();
 
 public :
-	IRISInterface();
-	//~IRISInterface();
+	GlassInterface();
+	//~GlassInterface ();
 
 	int getTotSampleno();
 	int getTotDimno();

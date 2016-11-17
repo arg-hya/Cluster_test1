@@ -109,6 +109,8 @@ int ClusterAlgo::getRandomPoints(int no_testPoints, int * testPoints)
 	{
 		int temp = RANDOM(0, totSample - 1);
 
+	//	if (Nodes[temp].numberOfAssignedClusters > 0)	continue;
+
 	//	if (isEvaluated(temp))	continue;
 
 		for (i = 0; i < k; i++)
@@ -116,7 +118,7 @@ int ClusterAlgo::getRandomPoints(int no_testPoints, int * testPoints)
 			if (testPoints[i] == temp)	break;
 		}
 
-		if (k == i)	testPoints[k++] = temp;
+		if (k == i)		testPoints[k++] = temp;
 
 	} while (k < no_testPoints);
 
@@ -126,7 +128,7 @@ int ClusterAlgo::getRandomPoints(int no_testPoints, int * testPoints)
 int ClusterAlgo::hard_clustering(int totDim, int *Input, int init_no_points, int *Output, int& out_init_no_points)
 {
 	//
-	unsigned int min_dis = 0;
+	double min_dis = 0;
 	int a = -1, b = -1;
 	int factor = HARD_CLUSTERING_FACTOR;
 
@@ -134,14 +136,14 @@ int ClusterAlgo::hard_clustering(int totDim, int *Input, int init_no_points, int
 	{
 		for (int j = i + 1; j < init_no_points; j++)
 		{
-			unsigned int dis = 0;
+			double dis = 0;
 
 			for (int k = 0; k < totDim; k++)
 			{
-				dis += (unsigned int)std::pow(Nodes[Input[i]].dim[k] - Nodes[Input[j]].dim[k], 2);
+				dis += std::pow(Nodes[Input[i]].dim[k] - Nodes[Input[j]].dim[k], 2);
 			}
 
-			dis = (unsigned int)std::sqrt(dis);
+			dis = std::sqrt(dis);
 
 			if ((dis < min_dis) || (i == 0))
 			{
@@ -154,9 +156,9 @@ int ClusterAlgo::hard_clustering(int totDim, int *Input, int init_no_points, int
 	//
 
 	//
-	unsigned int radius = min_dis;
+	double radius = min_dis;
 	node CENTROID;
-	CENTROID.dim = new int[totDim];
+	CENTROID.dim = new double[totDim];
 
 	for (int k = 0; k < totDim; k++)
 	{
@@ -174,13 +176,13 @@ int ClusterAlgo::hard_clustering(int totDim, int *Input, int init_no_points, int
 
 	for (int j = 0; j < init_no_points; j++)
 	{
-		unsigned int dis = 0;
+		double dis = 0;
 
 		for (int k = 0; k < totDim; k++)
 		{
-			dis += (unsigned int)std::pow(Nodes[Input[j]].dim[k] - CENTROID.dim[k], 2);
+			dis += std::pow(Nodes[Input[j]].dim[k] - CENTROID.dim[k], 2);
 		} 
-		dis = (unsigned int)std::sqrt(dis);
+		dis = std::sqrt(dis);
 
 		if (dis <= factor * radius)
 		{
@@ -246,7 +248,7 @@ bool ClusterAlgo::isAllMarkedAtleastOnce()
 int ClusterAlgo::formCluster(int &no_testPoints, int * testPoints, double *newCluster)
 {
 	//First euclidean distance calculate and then fft
-	int *avg_dim = new int[totDim];
+	double *avg_dim = new double[totDim];
 
 	for (int i = 0; i < totDim; i++)
 	{
@@ -256,7 +258,7 @@ int ClusterAlgo::formCluster(int &no_testPoints, int * testPoints, double *newCl
 			sum += Nodes[testPoints[j]].dim[i];
 		}
 		sum /= no_testPoints;
-		avg_dim[i] = (int)sum;
+		avg_dim[i] = sum;
 	}
 
 	FFT_WIKI::fft_test1(totDim, avg_dim, newCluster);
@@ -286,14 +288,14 @@ int ClusterAlgo::calculateThreshold(int &no_testPoints, int * testPoints, double
 	{
 		for (int j = i + 1 ; j < no_testPoints; j++)
 		{
-			unsigned int dis = 0;
+			double dis = 0;
 
 			for (int k = 0; k < totDim; k++)
 			{
-				dis += (unsigned int)std::pow(fftOfPoints[testPoints[i]].samples[k] - fftOfPoints[testPoints[j]].samples[k], 2);
+				dis += std::pow(fftOfPoints[testPoints[i]].samples[k] - fftOfPoints[testPoints[j]].samples[k], 2);
 			}
 
-			dis = (unsigned int)std::sqrt(dis);
+			dis = std::sqrt(dis);
 
 			if ((dis < min_dis) || (i == 0))
 			{
@@ -306,25 +308,30 @@ int ClusterAlgo::calculateThreshold(int &no_testPoints, int * testPoints, double
 	return SUCCESS;
 }
 
-int ClusterAlgo::markPoints_dotproduct(int clusterNos, double *newCluster, double threshold)
+int ClusterAlgo::markPoints_dotproduct(int clusterNos, double *newCluster, double threshold, int &no_testPoints, int * testPoints)
 {
 	int flag = 0;
 	double factor = 0.995;// MARK_POINTS_FACTOR;
 	std::vector<int> pos;
+	int inddx = RANDOM(0, no_testPoints - 1);
+	double *rand_center = fftOfPoints[testPoints[inddx]].samples;
 	for (int i = 0; i < totSample; i++)
 	{
 		double score = 0.0;
 		double a = 0.0, b = 0.0;
 		for (int j = 0; j < totDim; j++)
 		{
-			score += (fftOfPoints[i].samples[j] * newCluster[j]);
+			/*score += (fftOfPoints[i].samples[j] * newCluster[j]);
 			a += std::pow(fftOfPoints[i].samples[j], 2);
-			b += std::pow(newCluster[j], 2);
+			b += std::pow(newCluster[j], 2);*/
+			score += (fftOfPoints[i].samples[j] * rand_center[j]);
+			a += std::pow(fftOfPoints[i].samples[j], 2);
+			b += std::pow(rand_center[j], 2);
 		}
 		a = std::sqrt(a);
 		b = std::sqrt(b);
 		score /= (a*b);
-		//score /= (a - b);
+	//	score /= (a - b);
 		score = mod(score);
 		//double diff = a - b;
 		//diff /= (a*b);
@@ -496,7 +503,7 @@ int ClusterAlgo::compressClusters()
 	}
 
 	//find the one with minimum count
-	int min_clusternumber = -1;
+	int min_clusternumber = 0;
 	int count = ClusterFr[0].count;
 
 	for (i = 0; i < ClusterFr.size(); i++)
@@ -546,14 +553,34 @@ int ClusterAlgo::compressClusters()
 		if (sigClusters[k].ClusterNumber == min_clusternumber)	sigClusters[k].ClusterNumber = aliasClusterName;
 	}
 
+	if (ClusterFr.size() > 0)
+	{
+		std::vector<ClusterFreq>().swap(ClusterFr);
+	}
+
 	return SUCCESS;
+}
+
+bool ClusterAlgo::showResultsALL()
+{
+	for (int k = 0; k < totSample; k++)
+	{
+		std::cout << std::endl << "Sample No : " << k;
+		for (int j = 0; j < Nodes[k].numberOfAssignedClusters; j++)
+		{
+			std::cout << " " << "C: " << Nodes[k].clusterNos[j].clusterNumber <<
+				"P: " << Nodes[k].clusterNos[j].percision ;
+		}		
+	}
+	return true;
 }
 
 bool ClusterAlgo::showResults()
 {
 	for (int k = 0; k < totSample; k++)
 	{
-		std::cout << "Sample No : " << k << " Cluster : " << sigClusters[k].ClusterNumber << std::endl;
+		std::cout << "Sample No : " << k << " Cluster : " << sigClusters[k].ClusterNumber << std::endl;// <<
+		//	"P: " << sigClusters[k].percesion << std::endl;
 	}
 	return true;
 }
@@ -580,7 +607,7 @@ int ClusterAlgo::run()
 			calculateThreshold(no_testPoints, testPoints, threshold);
 			//markPointsIntra(init_no_points, testDeck , clusternumber); 
 			//if (SUCCESS == markPoints(clusternumber, newCluster, threshold))
-			if (SUCCESS == markPoints_dotproduct(clusternumber, newCluster, threshold))
+			if (SUCCESS == markPoints_dotproduct(clusternumber, newCluster, threshold, no_testPoints, testPoints))
 			{				
 				Clusters.push_back(newCluster);
 				clusternumber++;

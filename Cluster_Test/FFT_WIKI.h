@@ -24,5 +24,5 @@ namespace FFT_WIKI
 
 //public :
 
-	int fft_test1(int totDim, int* input, double* output);
+	int fft_test1(int totDim, double* input, double* output);
 };
